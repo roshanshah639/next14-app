@@ -1,8 +1,30 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import axios from "axios";
+import Link from "next/link";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
+  const router = useRouter();
+  const [data, setData] = useState("Nothing");
+  const logout = async () => {
+    try {
+      await axios.get("/api/users/logout");
+      toast.success("Logout successful");
+      router.push("/login");
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.message);
+    }
+  };
+  const getUserDetails = async () => {
+    const res = await axios.get("/api/users/me");
+    console.log(res.data);
+    setData(res.data.data._id);
+  };
   return (
-    <div className="min-h-screen container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
+    <div className="min-h-screen container mx-auto mt-1 p-6 bg-white shadow-lg rounded-lg">
       <div className="flex items-center justify-center mb-6">
         <img
           src="https://pbs.twimg.com/profile_images/1622254753425264640/RxeWXnCU_400x400.jpg"
@@ -58,6 +80,27 @@ const Profile = () => {
           {/* Add more experience details as needed */}
         </div>
       </div>
+      <h2 className="text-3xl font-bold mt-8 bg-green-500 text-white rounded-md px-3 py-2">
+        {data === "Nothing" ? (
+          "Nothing"
+        ) : (
+          <Link href={`/profile/${data}`}>{data}</Link>
+        )}
+      </h2>
+      <button
+        onClick={logout}
+        className="bg-orange-500 hover:bg-orange-700 text-white text-xl py-2 px-8 rounded-full mt-4"
+      >
+        Logout
+      </button>
+      <br />
+      <br />
+      <button
+        onClick={getUserDetails}
+        className="bg-green-500 hover:bg-green-600 text-white text-xl py-2 px-8 rounded-full mt-4"
+      >
+        Get User Details
+      </button>
     </div>
   );
 };
